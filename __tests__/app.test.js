@@ -1,11 +1,11 @@
 const app = require('../app');
 const connection = require('../db/connection');
 const seed = require('../db/seeds/seed');
-const devData = require('../db/data/test-data/index');
+const testData = require('../db/data/test-data/index');
 const request = require('supertest');
 
 beforeEach(() => {
-    return seed(devData);
+    return seed(testData);
 })
 
 afterAll(() => {
@@ -19,8 +19,9 @@ describe('GET /api/topics', () => {
             .expect(200)
             .then(({body}) => {
                 const {topics} = body;
+                console.log(testData.topicData)
                 expect(topics).toBeArray();
-                
+
                 topics.forEach(topic => {
                     expect(topic).toHaveProperty('slug', expect.any(String));
                     expect(topic).toHaveProperty('description', expect.any(String));
