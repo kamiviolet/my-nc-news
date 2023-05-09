@@ -31,3 +31,15 @@ describe('GET /api/topics', () => {
             })
     })
 })
+
+describe('GET /api/not-a-route', () => {
+    it('status 404 if the endpoint is not valid', () => {
+        return request(app)
+            .get('/api/not-a-route')
+            .expect(404)
+            .then(({body}) => {
+                const {message} = body;
+                expect(message).toBe('Not found.')
+            })
+    })
+})
