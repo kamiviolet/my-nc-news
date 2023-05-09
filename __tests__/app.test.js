@@ -63,7 +63,7 @@ describe('GET /api/articles/:article_id', () => {
             })
     })
 
-    it('status 400, invalid numeric article_id will respond with bad request', () => {
+    it('status 400, invalid article_id will respond with bad request', () => {
         return request(app)
             .get('/api/articles/99999')
             .expect(400)
