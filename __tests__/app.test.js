@@ -43,3 +43,33 @@ describe('GET /api/not-a-route', () => {
             })
     })
 })
+
+
+describe('GET /api/articles/:article_id', () => {
+    it('status 200, respond with the correct data by article_id', () => {
+        return request(app)
+            .get('/api/articles/2')
+            .expect(200)
+            .then(({body}) => {
+                const {article} = body;
+
+                expect(article).toHaveProperty('author', expect.any(String));
+                expect(article).toHaveProperty('title', expect.any(String));
+                expect(article).toHaveProperty('article_id', expect.any(Number));
+                expect(article).toHaveProperty('body', expect.any(String));
+                expect(article).toHaveProperty('votes', expect.any(Number));
+                expect(article).toHaveProperty('article_img_url', expect.any(String));
+                expect(article.article_id).toBe(2);
+            })
+    })
+
+    it('status 400, invalid numeric article_id will respond with bad request', () => {
+        return request(app)
+            .get('/api/articles/99999')
+            .expect(400)
+            .then(({body}) => {
+                const {message} = body;
+                expect(message).toBe('Bad request.')
+            })
+    })
+})
