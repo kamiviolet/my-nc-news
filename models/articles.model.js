@@ -10,7 +10,7 @@ exports.fetchArticleById = (id) => {
         `, [id])
         .then(({rows}) => {
             if (rows.length === 0) { 
-                return Promise.reject({status: 400, message: 'Bad request.'})
+                return Promise.reject({status: 404, message: 'No results.'})
             } else {
                 return rows[0]; 
             }

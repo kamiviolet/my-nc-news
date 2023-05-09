@@ -63,9 +63,20 @@ describe('GET /api/articles/:article_id', () => {
             })
     })
 
-    it('status 400, invalid article_id will respond with bad request', () => {
+    it('status 404, invalid numeric article_id will respond with bad request', () => {
         return request(app)
             .get('/api/articles/99999')
+            .expect(404)
+            .then(({body}) => {
+                const {message} = body;
+                expect(message).toBe('No results.')
+            })
+    })
+
+
+    it('status 400, invalid non-numeric article_id will respond with bad request', () => {
+        return request(app)
+            .get('/api/articles/non-sense')
             .expect(400)
             .then(({body}) => {
                 const {message} = body;
