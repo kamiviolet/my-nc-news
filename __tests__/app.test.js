@@ -15,5 +15,16 @@ afterAll(() => {
 describe('GET /api/topics', () => {
     it('status 200, responds with an array of topic objects,  each of which should have the following properties: slug, description.', () => {
         request(app)
+            .get('/api/topics')
+            .status(200)
+            .then(({body}) => {
+                const {topics} = body;
+                expect(topics).toBeArray();
+
+                topics.forEach(topic => {
+                    expect(topic).toHaveProperty('slug', expect.any(String));
+                    expect(topic).toHaveProperty('description', expect.any(String));
+                })
+            })
     })
 })
