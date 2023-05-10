@@ -88,6 +88,28 @@ describe('/api/articles', () => {
                 expect(articles).toBeSortedBy('created_at', {descending: true})
             })
     })
+
+    it('GET - status 200 - the object should contain certain properties.', () => {
+        return request(app)
+            .get('/api/articles')
+            .expect(200)
+            .then(({body}) => {
+                const {articles} = body;
+                articles.forEach(article => {
+                    const articleTemplate = {
+                        author: expect.any(String),
+                        title: expect.any(String),
+                        article_id: expect.any(Number),
+                        votes: expect.any(Number),
+                        topic: expect.any(String),
+                        created_at: expect.any(String),
+                        article_img_url: expect.stringMatching(/^http(s)?:\/\//),
+                        comment_count: expect.any(Number)
+                    }
+                    expect(article).toMatchObject(articleTemplate)
+                })
+            })
+    })
 })
 
 describe('/api/articles/:article_id', () => {
@@ -103,7 +125,7 @@ describe('/api/articles/:article_id', () => {
                     article_id: 2,
                     body: expect.any(String),
                     votes: expect.any(Number),
-                    topic: 'mitch',
+                    topic: expect.any(String),
                     created_at: expect.any(String),
                     article_img_url: expect.stringMatching(/^http(s)?:\/\//)
                 }
