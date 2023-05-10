@@ -1,8 +1,9 @@
 const app = require('../app');
 const connection = require('../db/connection');
 const seed = require('../db/seeds/seed');
-const testData = require('../db/data/test-data/index');
 const request = require('supertest');
+const endpoints = require('../endpoints.json');
+const testData = require('../db/data/test-data/index');
 
 beforeEach(() => {
     return seed(testData);
@@ -40,6 +41,20 @@ describe('GET /api/not-a-route', () => {
             .then(({body}) => {
                 const {message} = body;
                 expect(message).toBe('Not found.')
+            })
+        })
+})
+
+describe('GET /api', () => {
+    it('status 200, responds with JSON object.', () => {
+        return request(app)
+            .get('/api')
+            .expect(200)
+            .then(({body}) => {
+                const parsedEndpoints = JSON.parse(body.endpoints);
+
+                expect(parsedEndpoints).toBeInstanceOf(Object);
+                expect(Object.entries(parsedEndpoints).length).toBe(Object.entries(endpoints).length)
             })
     })
 })

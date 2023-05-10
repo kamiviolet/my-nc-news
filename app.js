@@ -1,11 +1,10 @@
 const express = require('express');
-const {
-    getInstructions
-} = require('./controllers/main.controller')
 const { getTopics } = require('./controllers/topics.controller')
+const { getInstructions } = require('./controllers/main.controller')
 const app = express();
 
-app.use(express.json());
+app.route('/api')
+    .get(getInstructions)
 
 app.route('/api/topics')
     .get(getTopics)
