@@ -2,7 +2,7 @@ const express = require('express');
 const { getTopics } = require('./controllers/topics.controller')
 const { getInstructions } = require('./controllers/main.controller')
 const { getArticleById, getAllArticles } = require('./controllers/articles.controller')
-const { getCommentsByArticleId } = require('./controllers/comments.controller')
+const { getCommentsByArticleId, postNewCommentByArticleId } = require('./controllers/comments.controller')
 const app = express();
 
 app.use(express.json())
@@ -21,6 +21,7 @@ app.route('/api/articles/:article_id')
 
 app.route('/api/articles/:article_id/comments')
     .get(getCommentsByArticleId)
+    .post(postNewCommentByArticleId)
 
 
 //Error-handler

@@ -32,7 +32,21 @@ exports.validateExistingId = (id) => {
     `, [id])
     .then(({rows}) => {
       if (rows.length === 0) {
-        return Promise.reject({status: 404, message: 'The article_id is currently not found.'})
+        return {status: 404, message: 'The article_id is currently not found.'}
+      }
+    })
+}
+
+exports.validateExistingUser = (username) => {
+  return db
+    .query(`
+      SELECT * 
+      FROM users
+      WHERE username in ($1)
+    `, [username])
+    .then(({rows}) => {
+      if (rows.length === 0) {
+        return {status: 404, message: 'The username is currently not found.'}
       }
     })
 }

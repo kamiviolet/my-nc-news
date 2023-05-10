@@ -171,6 +171,7 @@ describe('/api/articles/:article_id/comments', () => {
                 })
             })
     })
+
     it('GET - status 200 - each comment should have the certain properties.', () => {
         return request(app)
             .get('/api/articles/1/comments')
@@ -190,6 +191,7 @@ describe('/api/articles/:article_id/comments', () => {
                 })
             })
     })
+
     it('GET - status 200 - comments should be served with the most recent comments first.', () => {
         return request(app)
             .get('/api/articles/1/comments')
@@ -199,6 +201,7 @@ describe('/api/articles/:article_id/comments', () => {
                 expect(comments).toBeSortedBy('created_at', {descending: true});
             })
     })
+
     it('GET - status 200 - existing article_id without comments will return an empty array.', () => {
         return connection
             .query(`
@@ -248,6 +251,7 @@ describe('/api/articles/:article_id/comments', () => {
                 expect(message).toBe('Bad request.')
         })
     })
+
     it('GET - status 404 - invalid numeric article_id will respond with not found.', () => {
         return request(app)
             .get('/api/articles/99999/comments')
@@ -257,4 +261,71 @@ describe('/api/articles/:article_id/comments', () => {
                 expect(message).toBe('The article_id is currently not found.')
         })
      })
+     
+     it('POST - status 201 - responds with the posted comment in format of an object with properties of "username" and "body".', () => {
+        return request(app)
+            .post('/api/articles/2/comments')
+            .send({username: "lurker", body: "Good read!"})
+            .expect(201)
+            .then(({body}) => {
+                const {comment} = body;
+                const commentTemplate = {
+                    comment_id: expect.any(Number),
+                    votes: expect.any(Number),
+                    created_at: expect.any(String),
+                    author: expect.any(String),
+                    body: expect.any(String),
+                    article_id: expect.any(Number),
+                }
+                expect(comment).toMatchObject(commentTemplate);
+                expect(comment.author).toBe('lurker');
+                expect(comment.body).toBe('Good read!')
+        })
+     })
+
+     it('POST - status 400 - the request body is not in correct format.', () => {
+        return request(app)
+            .post('/api/articles/2/comments')
+            .send({nonsense: 'XXX', body: 'XXXX'})
+            .expect(400)
+            .then(({body}) => {
+                const {message} = body;
+                expect(message).toBe('Comment not in correct format.')
+        })
+    })
+
+    it('POST - status 400 - the article_id is not existing.', () => {
+        return request(app)
+            .post('/api/articles/99999/comments')
+            .send({username: 'XXX', body: 'XXXX'})
+            .expect(400)
+            .then(({body}) => {
+                const {message} = body;
+                expect(message).toBe('Apology. Non-existing article_id.')
+        })
+    })
+
+
+    it('POST - status 400 - the username is not existing.', () => {
+        return request(app)
+            .post('/api/articles/2/comments')
+            .send({username: 'XXX', body: 'XXXX'})
+            .expect(400)
+            .then(({body}) => {
+                const {message} = body;
+                expect(message).toBe('Apology. Non-existing username, please sign up to leave your comment.')
+        })
+    })
+
+    it('POST - status 400 - the article_id is invalid (non-numeric).', () => {
+        return request(app)
+            .post('/api/articles/non-sense/comments')
+            .send({username: 'XXX', body: 'XXXX'})
+            .expect(400)
+            .then(({body}) => {
+                const {message} = body;
+                expect(message).toBe('Invalid article_id.')
+        })
+    })
 })
+
