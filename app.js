@@ -1,13 +1,19 @@
 const express = require('express');
 const { getTopics } = require('./controllers/topics.controller')
 const { getInstructions } = require('./controllers/main.controller')
+const { getArticleById } = require('./controllers/articles.controller')
 const app = express();
+
+app.use(express.json())
 
 app.route('/api')
     .get(getInstructions)
 
 app.route('/api/topics')
     .get(getTopics)
+
+app.route('/api/articles/:article_id')
+    .get(getArticleById)
 
 //Error-handler
 app.use('/*', (req, res, next) => {
