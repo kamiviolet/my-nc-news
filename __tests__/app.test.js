@@ -13,6 +13,21 @@ afterAll(() => {
     if (connection) connection.end();
 })
 
+
+describe('GET /api', () => {
+    it('status 200, responds with JSON object.', () => {
+        return request(app)
+            .get('/api')
+            .expect(200)
+            .then(({body}) => {
+                const parsedEndpoints = JSON.parse(body.endpoints);
+
+                expect(parsedEndpoints).toBeInstanceOf(Object);
+                expect(Object.entries(parsedEndpoints).length).toBe(Object.entries(endpoints).length)
+            })
+    })
+})
+
 describe('/api/not-a-route', () => {
     it('GET - status 404 - invalid endpoints', () => {
         return request(app)
@@ -44,7 +59,6 @@ describe('/api/topics', () => {
             })
     })
 })
-
 
 describe('/api/articles/:article_id', () => {
     it('GET - status 200 - respond with the correct data by article_id', () => {
@@ -84,18 +98,4 @@ describe('/api/articles/:article_id', () => {
                 expect(message).toBe('Bad request.')
             })
         })
-})
-
-describe('GET /api', () => {
-    it('status 200, responds with JSON object.', () => {
-        return request(app)
-            .get('/api')
-            .expect(200)
-            .then(({body}) => {
-                const parsedEndpoints = JSON.parse(body.endpoints);
-
-                expect(parsedEndpoints).toBeInstanceOf(Object);
-                expect(Object.entries(parsedEndpoints).length).toBe(Object.entries(endpoints).length)
-            })
-    })
 })
