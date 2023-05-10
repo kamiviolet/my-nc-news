@@ -60,6 +60,36 @@ describe('/api/topics', () => {
     })
 })
 
+
+describe('/api/articles', () => {
+    it('GET - status 200 - responds with an array of articles from database.', () => {
+        return request(app)
+            .get('/api/articles')
+            .expect(200)
+            .then(({body}) => {
+                const {articles} = body;
+                const {articleData} = testData;
+
+                expect(articles).toBeArray();
+                expect(articles.length).toBe(articleData.length);
+
+                articles.forEach(article => {
+                    expect(article)
+                })
+            })
+    })
+
+    it('GET - status 200 - the received array should be sorted by date in descending order.', () => {
+        return request(app)
+            .get('/api/articles')
+            .expect(200)
+            .then(({body}) => {
+                const {articles} = body;
+                expect(articles).toBeSortedBy('created_at', {descending: true})
+            })
+    })
+})
+
 describe('/api/articles/:article_id', () => {
     it('GET - status 200 - respond with the correct data by article_id', () => {
         return request(app)
@@ -103,3 +133,4 @@ describe('/api/articles/:article_id', () => {
             })
         })
 })
+
