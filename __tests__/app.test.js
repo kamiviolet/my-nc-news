@@ -42,7 +42,7 @@ describe('GET /api/not-a-route', () => {
                 const {message} = body;
                 expect(message).toBe('Not found.')
             })
-    })
+        })
 })
 
 describe('GET /api', () => {
