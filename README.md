@@ -20,3 +20,13 @@ For security, the environment files are not included in this repository. In orde
 2. create '.env.test' and '.env.development' on the root directory.
 3. update the aforesaid env files with reference of '.env.example'.
 4. the database_name can be found inside ./db/setup.sql.
+
+
+## List of available endpoints for the API
+
+To get the list of available endpoints, please use GET to /api. The response will ccontain the following information:
+
+1. description of the endpoint
+2. acceptable query options
+3. format of request body for POST/PUT/PATCH
+4. examples of responses
