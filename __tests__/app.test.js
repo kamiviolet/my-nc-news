@@ -67,13 +67,17 @@ describe('/api/articles/:article_id', () => {
             .expect(200)
             .then(({body}) => {
                 const {article} = body;
-
-                expect(article).toHaveProperty('author', expect.any(String));
-                expect(article).toHaveProperty('title', expect.any(String));
-                expect(article).toHaveProperty('article_id', expect.any(Number));
-                expect(article).toHaveProperty('body', expect.any(String));
-                expect(article).toHaveProperty('votes', expect.any(Number));
-                expect(article).toHaveProperty('article_img_url', expect.any(String));
+                const articleTemplate = {
+                    author: expect.any(String),
+                    title: expect.any(String),
+                    article_id: 2,
+                    body: expect.any(String),
+                    votes: expect.any(Number),
+                    topic: 'mitch',
+                    created_at: expect.any(String),
+                    article_img_url: expect.stringMatching(/^http(s)?:\/\//)
+                }
+                expect(article).toMatchObject(articleTemplate)
                 expect(article.article_id).toBe(2);
             })
     })
