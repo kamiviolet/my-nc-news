@@ -287,6 +287,17 @@ describe('/api/articles/:article_id/comments', () => {
         })
     })
 
+    it('POST - status 400 - no request body is sent.', () => {
+        return request(app)
+            .post('/api/articles/2/comments')
+            .send({})
+            .expect(400)
+            .then(({body}) => {
+                const {message} = body;
+                expect(message).toBe('It seems you forget to send the request...')
+        })
+    })
+
     it('POST - status 400 - the article_id is not existing.', () => {
         return request(app)
             .post('/api/articles/99999/comments')
