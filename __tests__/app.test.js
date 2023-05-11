@@ -263,9 +263,10 @@ describe('/api/articles/:article_id/comments', () => {
      })
      
      it('POST - status 201 - responds with the posted comment in format of an object with properties of "username" and "body".', () => {
+        const example = {username: "lurker", body: "Good read!"};
         return request(app)
             .post('/api/articles/2/comments')
-            .send({username: "lurker", body: "Good read!"})
+            .send(example)
             .expect(201)
             .then(({body}) => {
                 const {comment} = body;
@@ -278,8 +279,8 @@ describe('/api/articles/:article_id/comments', () => {
                     article_id: expect.any(Number),
                 }
                 expect(comment).toMatchObject(commentTemplate);
-                expect(comment.author).toBe('lurker');
-                expect(comment.body).toBe('Good read!')
+                expect(comment.author).toBe(example.username);
+                expect(comment.body).toBe(example.body)
         })
      })
 
