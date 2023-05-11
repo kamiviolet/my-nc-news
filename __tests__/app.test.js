@@ -284,6 +284,28 @@ describe('/api/articles/:article_id/comments', () => {
         })
      })
 
+     it('POST - status 201 - should create a new comment with correct information in the database', () => {
+        const example = {username: "lurker", body: "Good read!"};
+        const article_id = 2;
+        return request(app)
+            .post(`/api/articles/${article_id}/comments`)
+            .send(example)
+            .expect(201)
+            .then(() => {
+                return connection
+                    .query(`
+                        SELECT * FROM comments
+                        WHERE author = $1 AND body = $2 AND article_id = $3;
+                    `, [example.username, example.body, article_id])
+            })
+            .then(({rows}) => {
+                expect(rows.length).toBe(1);
+                expect(rows[0].author).toBe(example.username);
+                expect(rows[0].body).toBe(example.body);
+                expect(rows[0].article_id).toBe(article_id);
+            })
+     })
+
      it('POST - status 400 - the request body is not in correct format.', () => {
         return request(app)
             .post('/api/articles/2/comments')
