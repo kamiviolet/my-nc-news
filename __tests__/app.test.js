@@ -200,43 +200,13 @@ describe('/api/articles/:article_id/comments', () => {
             })
     })
     it('GET - status 200 - existing article_id without comments will return an empty array.', () => {
-        return connection
-            .query(`
-                SELECT
-                articles.article_id, COUNT(comments.*) AS comment_count
-                FROM articles
-                LEFT JOIN comments USING (article_id)
-                GROUP BY articles.article_id
-            `)
-            .then(({rows}) => {
-                return rows.filter(article => +article.comment_count === 0)
-            })
-            .then(articlesWithoutComments => {
-                return articlesWithoutComments.map(article => article.article_id)
-            })
-            .then(listOfArticlesWithoutComments => {
-                let index = 0;
-                let length = listOfArticlesWithoutComments.length
-
-                if (length === 0) {
-                    return;
-                } else if (length === 1) {
-                    index = index;
-                } else {
-                    index = Math.ceil(Math.random() * length)
-                }
-                return listOfArticlesWithoutComments[index];
-            })
-            .then((id) => {
-                if (id === undefined) return;
-                return request(app)
-                    .get(`/api/articles/${id}/comments`)
-                    .expect(200)
-                    .then(({body}) => {
-                        const {comments} = body;
-                        expect(comments).toBeArrayOfSize(0); 
-                    })
-            })
+        return request(app)
+        .get(`/api/articles/2/comments`)
+        .expect(200)
+        .then(({body}) => {
+            const {comments} = body;
+            expect(comments).toBeArrayOfSize(0); 
+        })
     })
 
     it('GET - status 400 - invalid non-numeric article_id will respond with bad request', () => {
