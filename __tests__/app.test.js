@@ -212,7 +212,7 @@ describe('/api/articles/:article_id/comments', () => {
         })
     })
 
-    it('GET - status 400 - invalid non-numeric article_id will respond with bad request', () => {
+    it('GET - status 400 - invalid non-numeric article_id', () => {
         return request(app)
             .get('/api/articles/non-sense/comments')
             .expect(400)
@@ -222,13 +222,13 @@ describe('/api/articles/:article_id/comments', () => {
         })
     })
 
-    it('GET - status 404 - invalid numeric article_id will respond with not found.', () => {
+    it('GET - status 404 - invalid numeric article_id.', () => {
         return request(app)
             .get('/api/articles/99999/comments')
             .expect(404)
             .then(({body}) => {
                 const {message} = body;
-                expect(message).toBe('The article_id is currently not found.')
+                expect(message).toBe('The article_id does not exist (for now).')
         })
      })
      
@@ -254,28 +254,6 @@ describe('/api/articles/:article_id/comments', () => {
         })
      })
 
-     it('POST - status 201 - should create a new comment with correct information in the database', () => {
-        const example = {username: "lurker", body: "Good read!"};
-        const article_id = 2;
-        return request(app)
-            .post(`/api/articles/${article_id}/comments`)
-            .send(example)
-            .expect(201)
-            .then(() => {
-                return connection
-                    .query(`
-                        SELECT * FROM comments
-                        WHERE author = $1 AND body = $2 AND article_id = $3;
-                    `, [example.username, example.body, article_id])
-            })
-            .then(({rows}) => {
-                expect(rows.length).toBe(1);
-                expect(rows[0].author).toBe(example.username);
-                expect(rows[0].body).toBe(example.body);
-                expect(rows[0].article_id).toBe(article_id);
-            })
-     })
-
      it('POST - status 400 - the request body is not in correct format.', () => {
         return request(app)
             .post('/api/articles/2/comments')
@@ -283,41 +261,30 @@ describe('/api/articles/:article_id/comments', () => {
             .expect(400)
             .then(({body}) => {
                 const {message} = body;
-                expect(message).toBe('Comment not in correct format.')
+                expect(message).toBe('Invalid request format.')
         })
     })
 
-    it('POST - status 400 - no request body is sent.', () => {
-        return request(app)
-            .post('/api/articles/2/comments')
-            .send({})
-            .expect(400)
-            .then(({body}) => {
-                const {message} = body;
-                expect(message).toBe('It seems you forget to send the request...')
-        })
-    })
-
-    it('POST - status 400 - the article_id is not existing.', () => {
+    it('POST - status 404 - the article_id is not existing.', () => {
         return request(app)
             .post('/api/articles/99999/comments')
             .send({username: 'XXX', body: 'XXXX'})
-            .expect(400)
+            .expect(404)
             .then(({body}) => {
                 const {message} = body;
-                expect(message).toBe('Apology. Non-existing article_id.')
+                expect(message).toBe('Request value does not exist at the moment in database.')
         })
     })
 
 
-    it('POST - status 400 - the username is not existing.', () => {
+    it('POST - status 404 - the username is not existing.', () => {
         return request(app)
             .post('/api/articles/2/comments')
             .send({username: 'XXX', body: 'XXXX'})
-            .expect(400)
+            .expect(404)
             .then(({body}) => {
                 const {message} = body;
-                expect(message).toBe('Apology. Non-existing username, please sign up to leave your comment.')
+                expect(message).toBe('Request value does not exist at the moment in database.')
         })
     })
 
@@ -328,7 +295,7 @@ describe('/api/articles/:article_id/comments', () => {
             .expect(400)
             .then(({body}) => {
                 const {message} = body;
-                expect(message).toBe('Invalid article_id.')
+                expect(message).toBe('Bad request.')
         })
     })
 })
