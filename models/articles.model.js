@@ -1,19 +1,24 @@
 const db = require('../db/connection')
 const {validateExistingArticleId, validateExistingTopic} = require('../db/seeds/utils')
 
+
 exports.fetchArticleById = (id) => {
     return db
         .query(`
             SELECT
-            author, title, article_id, body, topic, created_at, votes, article_img_url
+            articles.*, COUNT(comments.*) AS comment_count
             FROM articles
+            FULL JOIN comments USING (article_id)
             WHERE article_id in ($1)
+            GROUP BY articles.article_id;
         `, [id])
         .then(({rows}) => {
             if (rows.length === 0) { 
                 return Promise.reject({status: 404, message: 'No results.'})
             } else {
-                return rows[0]; 
+                const clone = JSON.parse(JSON.stringify(rows[0]))
+                clone.comment_count = +rows[0].comment_count
+                return clone;
             }
         })
 }

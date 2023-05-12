@@ -220,6 +220,7 @@ describe('/api/articles/:article_id', () => {
                     votes: expect.any(Number),
                     topic: expect.any(String),
                     created_at: expect.any(String),
+                    comment_count: expect.any(Number),
                     article_img_url: expect.stringMatching(/^http(s)?:\/\//)
                 }
                 expect(article).toMatchObject(articleTemplate)
@@ -227,6 +228,7 @@ describe('/api/articles/:article_id', () => {
                 expect(article.created_at).toBeDateString();
             })
     })
+    
 
     it('GET - status 404 - invalid numeric article_id will respond with not found.', () => {
         return request(app)
