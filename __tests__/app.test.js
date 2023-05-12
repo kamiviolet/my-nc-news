@@ -2,7 +2,7 @@ const app = require('../app');
 const connection = require('../db/connection');
 const seed = require('../db/seeds/seed');
 const request = require('supertest');
-const endpoints = require('../endpoints.json');
+const endpointList = require('../endpoints.json');
 const testData = require('../db/data/test-data/index');
 
 beforeEach(() => {
@@ -22,10 +22,9 @@ describe('/api', () => {
             .get('/api')
             .expect(200)
             .then(({body}) => {
-                const parsedEndpoints = JSON.parse(body.endpoints);
-
-                expect(parsedEndpoints).toBeInstanceOf(Object);
-                expect(Object.entries(parsedEndpoints).length).toBe(Object.entries(endpoints).length)
+                const {endpoints} = body;
+                expect(typeof endpoints).toBe('object');
+                expect(Object.entries(endpoints).length).toBe(Object.entries(endpointList).length)
             })
     })
 })

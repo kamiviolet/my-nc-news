@@ -1,7 +1,5 @@
-const {fetchInstructions} = require('../models/main.model');
+const endpoints = require('../endpoints.json');
 
 exports.getInstructions = (req, res, next) => {
-    return fetchInstructions()
-        .then((endpoints) => res.status(200).send({endpoints}))
-        .catch(err => next(err));
+    res.status(200).send({endpoints})
 }
