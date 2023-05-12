@@ -50,3 +50,17 @@ exports.validateExistingCommentId = (id) => {
       }
     })
 }
+
+exports.validateExistingTopic = (topic) => {
+  return db
+    .query(`
+      SELECT * 
+      FROM topics
+      WHERE slug in ($1);
+    `, [topic])
+    .then(({rows}) => {
+      if (rows.length === 0 && topic) {
+        return Promise.reject({status: 404, message: 'The topic does not exist (for now).'})
+      }
+    })
+}

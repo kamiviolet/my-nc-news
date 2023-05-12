@@ -9,11 +9,11 @@ exports.getArticleById = (req, res, next) => {
 }
 
 exports.getAllArticles = (req, res, next) => {
-    return fetchAllArticles()
+    const {topic, sort_by, order} = req.query;
+
+    return fetchAllArticles(topic, sort_by, order)
         .then(articles => res.status(200).send({articles}))
-        .catch(err => {
-            console.log(err)
-            next(err)});
+        .catch(err => next(err));
 }
 
 exports.patchVotesByArticleId = (req, res, next) => {
