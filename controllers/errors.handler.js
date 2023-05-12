@@ -3,7 +3,6 @@ exports.handleInvalidEndpoint = (req, res, next) => {
 }
 
 exports.handleDatabaseError = (err, req, res, next) => {
-
     if (err.code) {
         if (err.code === '22P02') {
             res.status(400).send({message: 'Invalid request input.'});
@@ -17,7 +16,7 @@ exports.handleDatabaseError = (err, req, res, next) => {
             res.status(404).send({message: 'Request value does not exist at the moment in database.'});
         }
 
-        res.status(400).send({message: 'Bad request.'});
+        res.status(400).send({message: 'Unidentified database issue.'});
 
     } else {
         next(err);
