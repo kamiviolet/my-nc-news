@@ -19,7 +19,7 @@ app.route('/api/topics')
 app.route('/api/articles')
     .get(getAllArticles)
 
-    app.route('/api/articles/:article_id')
+app.route('/api/articles/:article_id')
     .get(getArticleById)
     .patch(patchVotesByArticleId)
 
