@@ -3,11 +3,6 @@ const {validateExistingArticleId, validateExistingCommentId} = require('../db/se
 
 exports.fetchCommentsByArticleId = (id) => {
     return validateExistingArticleId(id)
-        .then((msg) => {
-            if (msg !== undefined) {
-                return Promise.reject(msg);
-            }
-        })
         .then(() => {
             return db.query(`
                 SELECT
@@ -34,11 +29,6 @@ exports.createNewCommentByArticleId = (id, comment) => {
 
 exports.eraseCommentByCommentId = (id) => {
     return validateExistingCommentId(id)
-        .then((msg) => {
-            if (msg !== undefined) {
-                return Promise.reject(msg);
-            }
-        })
         .then(() => {
             return db
                 .query(`

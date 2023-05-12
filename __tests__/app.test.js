@@ -80,7 +80,7 @@ describe('/api/articles', () => {
             })
     })
 
-    it('GET - status 200 - the received array should be sorted by date in descending order.', () => {
+    it('GET - status 200 - default sorted by date in descending order.', () => {
         return request(app)
             .get('/api/articles')
             .expect(200)
@@ -111,6 +111,97 @@ describe('/api/articles', () => {
                     expect(article.created_at).toBeDateString();
                 })
             })
+    })
+
+    it('GET - status 200 - accept queries: topic to filter related topic.', () => {
+        return request(app)
+            .get('/api/articles?topic=mitch')
+            .expect(200)
+            .then(({body}) => {
+                const {articles} = body;
+                articles.forEach(article => {
+                    expect(article.topic).toBe('mitch');
+                })
+            })
+    })
+
+    it('GET - status 200 - accept queries: sort_by to sort the entries by any specific column.', () => {
+        return request(app)
+            .get('/api/articles?sort_by=author')
+            .expect(200)
+            .then(({body}) => {
+                const {articles} = body;
+                expect(articles).toBeSortedBy('author', {descending: true});
+            })
+    })
+
+    it('GET - status 200 - accept queries: order to change the display order.', () => {
+        return request(app)
+            .get('/api/articles?order=asc')
+            .expect(200)
+            .then(({body}) => {
+                const {articles} = body;
+                expect(articles).toBeSortedBy('created_at', {descending: false});
+            })
+    })
+
+    it('GET - status 200 - existing topic but without articles at the moment.', () => {
+        return request(app)
+            .get('/api/articles?topic=paper')
+            .expect(200)
+            .then(({body}) => {
+                const {articles} = body;
+                expect(articles).toBeArrayOfSize(0);
+            })
+    })
+
+    it('GET - status 200 - accept multi queries at the same time.', () => {
+        const query1 = 'topic=mitch';
+        const query2 = 'sort_by=votes';
+        const query3 = 'order=asc';
+
+        return request(app)
+            .get(`/api/articles?${query1}&${query2}&${query3}`)
+            .expect(200)
+            .then(({body}) => {
+                const {articles} = body;
+
+                expect(articles).toBeSortedBy('votes', {descending: false});
+
+                articles.forEach(article => {
+                    expect(article.topic).toBe('mitch');
+                })
+            })
+    })
+
+    it('GET - status 404 - non existing topic for filtering.', () => {
+        return request(app)
+            .get('/api/articles?topic=XXX')
+            .expect(404)
+                .then(({body}) => {
+                    const {message} = body;
+                    expect(message).toBe('The topic does not exist (for now).');
+                })
+    })
+
+    it('GET - status 400 - invalid column for sorting entries.', () => {
+        return request(app)
+            .get('/api/articles?sort_by=XXX')
+            .expect(400)
+                .then(({body}) => {
+                    const {message} = body;
+                    expect(message).toBe('Bad request.');
+                })
+    })
+
+    it('GET - status 400 - invalid value for order query.', () => {
+        return request(app)
+            .get('/api/articles?sort_by=XXX')
+            .expect(400)
+                .then(({body}) => {
+                    const {message} = body;
+                    expect(message).toBe('Bad request.');
+                })
     })
 })
 

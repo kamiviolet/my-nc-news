@@ -1,5 +1,5 @@
 const db = require('../db/connection')
-const {validateExistingArticleId} = require('../db/seeds/utils')
+const {validateExistingArticleId, validateExistingTopic} = require('../db/seeds/utils')
 
 exports.fetchArticleById = (id) => {
     return db
@@ -18,17 +18,30 @@ exports.fetchArticleById = (id) => {
         })
 }
 
-exports.fetchAllArticles = () => {
-    return db
-        .query(`
-            SELECT
-            articles.author, articles.title, articles.article_id, articles.topic, articles.created_at, articles.votes, articles.article_img_url, COUNT(comments.*) AS comment_count
-            FROM articles
-            FULL JOIN comments USING (article_id)
-            GROUP BY articles.article_id
-            ORDER BY created_at DESC;
-        `)
-        .then(({rows}) => {
+exports.fetchAllArticles = (topic, sort, order) => {
+    const greenlist = ['author', 'title', 'article_id', 'topic', 'created_at', 'votes', 'comment_count'];
+    let formattedOrder = order.toUpperCase();
+    let queryStr = `
+        SELECT
+        articles.author, articles.title, articles.article_id, articles.topic, articles.created_at, articles.votes, articles.article_img_url, COUNT(comments.*) AS comment_count
+        FROM articles
+        FULL JOIN comments USING (article_id)`;
+    const queryVal = [];
+
+    if (!greenlist.includes(sort)) {
+        return Promise.reject({status: 400, message: 'Bad request.'})
+    }
+
+    if (topic) {
+        queryStr += "WHERE articles.topic = $1";
+        queryVal.push(topic);
+    }
+
+    queryStr += `\nGROUP BY articles.article_id, articles.topic ORDER BY ${sort} ${formattedOrder};`
+
+    return validateExistingTopic(topic)
+        .then(() => db.query(queryStr, queryVal))
+        .then(({rows}) => {        
             const copy = rows.map(d => {
                 const clone = JSON.parse(JSON.stringify(d))
                 clone.comment_count = +d.comment_count
@@ -41,11 +54,6 @@ exports.fetchAllArticles = () => {
 
 exports.updateVotesByArticleId = (id, update) => {
     return validateExistingArticleId(id)
-        .then((msg) => {
-            if (msg !== undefined) {
-                return Promise.reject(msg);
-            }
-        })
         .then(() => {
             return db.query(`
                 UPDATE articles
