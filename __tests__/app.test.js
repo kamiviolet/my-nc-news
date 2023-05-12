@@ -391,3 +391,32 @@ describe('/api/articles/:article_id/comments', () => {
     })
 })
 
+
+describe('/api/comments/:comment_id', () => {
+    it('DELETE - status 204 - delete the given comment by comment_id from database', () => {
+        return request(app)
+            .delete('/api/comments/2')
+            .expect(204)
+            .then(({body}) => {
+                expect(body).toBeEmptyObject();
+            })
+    })
+    it('DELETE - status 404 - non exsiting comment_id', () => {
+        return request(app)
+            .delete('/api/comments/99999')
+            .expect(404)
+            .then(({body}) => {
+                const {message} = body;
+                expect(message).toBe('The comment_id does not exist (for now).')
+            })
+    })
+    it('DELETE - status 400 - invalid comment_id', () => {
+        return request(app)
+            .delete('/api/comments/non-sense')
+            .expect(400)
+            .then(({body}) => {
+                const {message} = body;
+                expect(message).toBe('Invalid request input.')
+            })
+    })
+})
