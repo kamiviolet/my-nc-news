@@ -419,3 +419,33 @@ describe('/api/comments/:comment_id', () => {
             })
     })
 })
+
+
+describe('/api/users', () => {    
+    it('GET - status 200 - responds with an array of objects.', () => {
+        const {userData} = testData;
+
+        return request(app)
+            .get('/api/users')
+            .expect(200)
+            .then(({body}) => {
+                const {users} = body;
+                expect(users).toBeArray();
+                expect(users).toBeArrayOfSize(userData.length);
+            })
+    })
+
+    it('GET - status 200 - every objects contains certain properties.', () => {
+        return request(app)
+            .get('/api/users')
+            .expect(200)
+            .then(({body}) => {
+                const {users} = body;
+                users.forEach(user => {
+                    expect(user).toHaveProperty('username');
+                    expect(user).toHaveProperty('name');
+                    expect(user).toHaveProperty('avatar_url');
+                })
+            })
+    })
+})

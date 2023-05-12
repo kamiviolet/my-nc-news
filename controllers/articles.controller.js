@@ -11,7 +11,9 @@ exports.getArticleById = (req, res, next) => {
 exports.getAllArticles = (req, res, next) => {
     return fetchAllArticles()
         .then(articles => res.status(200).send({articles}))
-        .catch(err => next(err));
+        .catch(err => {
+            console.log(err)
+            next(err)});
 }
 
 exports.patchVotesByArticleId = (req, res, next) => {
