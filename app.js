@@ -1,7 +1,7 @@
 const express = require('express');
 const { getTopics } = require('./controllers/topics.controller')
 const { getInstructions } = require('./controllers/main.controller')
-const { getArticleById, getAllArticles } = require('./controllers/articles.controller')
+const { getArticleById, getAllArticles, patchVotesByArticleId } = require('./controllers/articles.controller')
 const { getCommentsByArticleId, postNewCommentByArticleId } = require('./controllers/comments.controller')
 const { handleDatabaseError, handleCustomError, handleRestError, handleInvalidEndpoint } = require('./controllers/errors.handler')
 const app = express();
@@ -17,8 +17,9 @@ app.route('/api/topics')
 app.route('/api/articles')
     .get(getAllArticles)
 
-app.route('/api/articles/:article_id')
+    app.route('/api/articles/:article_id')
     .get(getArticleById)
+    .patch(patchVotesByArticleId)
 
 app.route('/api/articles/:article_id/comments')
     .get(getCommentsByArticleId)

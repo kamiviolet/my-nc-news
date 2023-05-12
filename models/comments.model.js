@@ -1,6 +1,5 @@
 const db = require('../db/connection')
-const format = require('pg-format')
-const {validateExistingId, validateExistingUser} = require('../db/seeds/utils')
+const {validateExistingId} = require('../db/seeds/utils')
 
 exports.fetchCommentsByArticleId = (id) => {
     return validateExistingId(id)
@@ -28,5 +27,5 @@ exports.createNewCommentByArticleId = (id, comment) => {
                 ($1, $3, $2)
                 RETURNING *;
             `, [id, comment.username, comment.body])
-        .then(({rows}) => rows)
+        .then(({rows}) => rows[0])
 }

@@ -153,9 +153,98 @@ describe('/api/articles/:article_id', () => {
             .expect(400)
             .then(({body}) => {
                 const {message} = body;
-                expect(message).toBe('Bad request.')
+                expect(message).toBe('Invalid request input.')
             })
-        })
+    })
+
+    it('PATCH - status 201 - responds with the updated article.', () => {
+        const example = { inc_votes : 1 };
+
+        return request(app)
+            .patch('/api/articles/2')
+            .send(example)
+            .expect(201)
+            .then(({body}) => {
+                const {article} = body;
+                const articleTemplate = {
+                    author: expect.any(String),
+                    title: expect.any(String),
+                    article_id: 2,
+                    body: expect.any(String),
+                    votes: expect.any(Number),
+                    topic: expect.any(String),
+                    created_at: expect.any(String),
+                    article_img_url: expect.stringMatching(/^http(s)?:\/\//)
+                }
+
+                expect(article).toMatchObject(articleTemplate);
+                expect(article.votes).toBe(example.inc_votes);
+            })
+    })
+
+    it('PATCH - status 201 - the article in database is updated accordingly.', () => {
+        const example = { inc_votes : 1000 };
+        const article_id = 2;
+        return request(app)
+            .patch(`/api/articles/${article_id}`)
+            .send(example)
+            .expect(201)
+            .then(() => {
+                return connection
+                    .query(`
+                        SELECT * FROM articles
+                        WHERE article_id in ($1);
+                    `, [article_id])
+            })
+            .then(({rows}) => rows[0])
+            .then(article => {
+                expect(article.votes).toBe(example.inc_votes);
+            })
+    })
+
+    it('PATCH - status 400 - invalid request format.', () => {
+        return request(app)
+            .patch('/api/articles/2')
+            .send({ nonsense: 'Wahaha' })
+            .expect(400)
+            .then(({body}) => {
+                const {message} = body;
+                expect(message).toBe('Invalid request format.')
+            })
+    })
+
+    it('PATCH - status 400 - no request body.', () => {
+        return request(app)
+            .patch('/api/articles/2')
+            .send({})
+            .expect(400)
+            .then(({body}) => {
+                const {message} = body;
+                expect(message).toBe('Invalid request format.')
+            })
+    })
+
+    it('PATCH - status 400 - invalid numeric article_id.', () => {
+        return request(app)
+            .patch('/api/articles/99999')
+            .send({ inc_votes : 1 })
+            .expect(404)
+            .then(({body}) => {
+                const {message} = body;
+                expect(message).toBe('The article_id does not exist (for now).')
+            })
+    })
+
+    it('PATCH - status 400 - invalid non-numeric article_id.', () => {
+        return request(app)
+            .patch('/api/articles/non-sense')
+            .send({ inc_votes : 1 })
+            .expect(400)
+            .then(({body}) => {
+                const {message} = body;
+                expect(message).toBe('Invalid request input.')
+            })
+    })
 })
 
 describe('/api/articles/:article_id/comments', () => {
@@ -218,7 +307,7 @@ describe('/api/articles/:article_id/comments', () => {
             .expect(400)
             .then(({body}) => {
                 const {message} = body;
-                expect(message).toBe('Bad request.')
+                expect(message).toBe('Invalid request input.')
         })
     })
 

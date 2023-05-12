@@ -8,7 +8,9 @@
     "seed": "node ./db/seeds/run-seed.js",
     "test": "jest",
     "prepare": "husky install",
-    "check-test": "jest --detectOpenHandles"
+    "check-test": "jest --detectOpenHandles",
+    "start": "node listen.js",
+    "seed-prod": "NODE_ENV=production npm run seed"
   },
   "repository": {
     "type": "git",
