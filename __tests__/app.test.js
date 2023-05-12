@@ -257,7 +257,7 @@ describe('/api/articles/:article_id/comments', () => {
      it('POST - status 400 - the request body is not in correct format.', () => {
         return request(app)
             .post('/api/articles/2/comments')
-            .send({nonsense: 'XXX', body: 'XXXX'})
+            .send({nonsense: 'XXX', body: "Good read!"})
             .expect(400)
             .then(({body}) => {
                 const {message} = body;
@@ -268,7 +268,7 @@ describe('/api/articles/:article_id/comments', () => {
     it('POST - status 404 - the article_id is not existing.', () => {
         return request(app)
             .post('/api/articles/99999/comments')
-            .send({username: 'XXX', body: 'XXXX'})
+            .send({username: "lurker", body: "Good read!"})
             .expect(404)
             .then(({body}) => {
                 const {message} = body;
@@ -280,7 +280,7 @@ describe('/api/articles/:article_id/comments', () => {
     it('POST - status 404 - the username is not existing.', () => {
         return request(app)
             .post('/api/articles/2/comments')
-            .send({username: 'XXX', body: 'XXXX'})
+            .send({username: "XXXX", body: "Good read!"})
             .expect(404)
             .then(({body}) => {
                 const {message} = body;
@@ -291,7 +291,7 @@ describe('/api/articles/:article_id/comments', () => {
     it('POST - status 400 - the article_id is invalid (non-numeric).', () => {
         return request(app)
             .post('/api/articles/non-sense/comments')
-            .send({username: 'XXX', body: 'XXXX'})
+            .send({username: "lurker", body: "Good read!"})
             .expect(400)
             .then(({body}) => {
                 const {message} = body;
