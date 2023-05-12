@@ -23,7 +23,7 @@ exports.formatComments = (comments, idLookup) => {
   });
 };
 
-exports.validateExistingId = (id) => {
+exports.validateExistingArticleId = (id) => {
   return db
     .query(`
       SELECT * 
@@ -33,6 +33,20 @@ exports.validateExistingId = (id) => {
     .then(({rows}) => {
       if (rows.length === 0) {
         return Promise.reject({status: 404, message: 'The article_id does not exist (for now).'})
+      }
+    })
+}
+
+exports.validateExistingCommentId = (id) => {
+  return db
+    .query(`
+      SELECT * 
+      FROM comments
+      WHERE comment_id in ($1)
+    `, [id])
+    .then(({rows}) => {
+      if (rows.length === 0) {
+        return Promise.reject({status: 404, message: 'The comment_id does not exist (for now).'})
       }
     })
 }

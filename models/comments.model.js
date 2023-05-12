@@ -1,12 +1,14 @@
 const db = require('../db/connection')
-const {validateExistingId} = require('../db/seeds/utils')
+const {validateExistingArticleId, validateExistingCommentId} = require('../db/seeds/utils')
 
 exports.fetchCommentsByArticleId = (id) => {
-    return validateExistingId(id)
+    return validateExistingArticleId(id)
         .then((msg) => {
             if (msg !== undefined) {
                 return Promise.reject(msg);
             }
+        })
+        .then(() => {
             return db.query(`
                 SELECT
                 comment_id, votes, created_at, author, body, article_id
@@ -28,4 +30,20 @@ exports.createNewCommentByArticleId = (id, comment) => {
                 RETURNING *;
             `, [id, comment.username, comment.body])
         .then(({rows}) => rows[0])
+}
+
+exports.eraseCommentByCommentId = (id) => {
+    return validateExistingCommentId(id)
+        .then((msg) => {
+            if (msg !== undefined) {
+                return Promise.reject(msg);
+            }
+        })
+        .then(() => {
+            return db
+                .query(`
+                    DELETE FROM comments
+                    WHERE comment_id in ($1);
+                `, [id])
+        })
 }

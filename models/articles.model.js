@@ -1,5 +1,5 @@
 const db = require('../db/connection')
-const {validateExistingId} = require('../db/seeds/utils')
+const {validateExistingArticleId} = require('../db/seeds/utils')
 
 exports.fetchArticleById = (id) => {
     return db
@@ -40,7 +40,7 @@ exports.fetchAllArticles = () => {
 
 
 exports.updateVotesByArticleId = (id, update) => {
-    return validateExistingId(id)
+    return validateExistingArticleId(id)
         .then((msg) => {
             if (msg !== undefined) {
                 return Promise.reject(msg);
