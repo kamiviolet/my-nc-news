@@ -1,4 +1,5 @@
 const db = require('../db/connection')
+const {validateExistingId} = require('../db/seeds/utils')
 
 exports.fetchArticleById = (id) => {
     return db
@@ -35,4 +36,23 @@ exports.fetchAllArticles = () => {
             });
             return copy;
         })
+}
+
+
+exports.updateVotesByArticleId = (id, update) => {
+    return validateExistingId(id)
+        .then((msg) => {
+            if (msg !== undefined) {
+                return Promise.reject(msg);
+            }
+        })
+        .then(() => {
+            return db.query(`
+                UPDATE articles
+                SET votes = votes + $2
+                WHERE article_id = $1
+                RETURNING *;
+            `, [id, update.inc_votes])
+        })
+        .then(({rows}) => rows[0])
 }
