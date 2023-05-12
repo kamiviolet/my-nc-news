@@ -20,6 +20,7 @@ exports.fetchArticleById = (id) => {
 
 exports.fetchAllArticles = (topic, sort, order) => {
     const greenlist = ['author', 'title', 'article_id', 'topic', 'created_at', 'votes', 'comment_count'];
+    const orderOption = ['desc', 'asc'];
     let formattedOrder = order.toUpperCase();
     let queryStr = `
         SELECT
@@ -29,6 +30,10 @@ exports.fetchAllArticles = (topic, sort, order) => {
     const queryVal = [];
 
     if (!greenlist.includes(sort)) {
+        return Promise.reject({status: 400, message: 'Bad request.'})
+    }
+
+    if (!orderOption.includes(order)) {
         return Promise.reject({status: 400, message: 'Bad request.'})
     }
 

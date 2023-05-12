@@ -196,7 +196,7 @@ describe('/api/articles', () => {
 
     it('GET - status 400 - invalid value for order query.', () => {
         return request(app)
-            .get('/api/articles?sort_by=XXX')
+            .get('/api/articles?order=XXX')
             .expect(400)
                 .then(({body}) => {
                     const {message} = body;
