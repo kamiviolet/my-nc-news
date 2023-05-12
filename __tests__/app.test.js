@@ -10,7 +10,9 @@ beforeEach(() => {
 })
 
 afterAll(() => {
-    if (connection) connection.end();
+    if (connection) {
+        return connection.end()
+    };
 })
 
 
