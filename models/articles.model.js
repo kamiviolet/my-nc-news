@@ -18,7 +18,7 @@ exports.fetchArticleById = (id) => {
         })
 }
 
-exports.fetchAllArticles = (topic, sort, order) => {
+exports.fetchAllArticles = (topic, sort='created_at', order='desc') => {
     const greenlist = ['author', 'title', 'article_id', 'topic', 'created_at', 'votes', 'comment_count'];
     const orderOption = ['desc', 'asc'];
     let formattedOrder = order.toUpperCase();
