@@ -6,7 +6,7 @@ exports.handleDatabaseError = (err, req, res, next) => {
 
     if (err.code) {
         if (err.code === '22P02') {
-            res.status(400).send({message: 'Bad request.'});
+            res.status(400).send({message: 'Invalid request input.'});
         }
         
         if (err.code === '23502') {
@@ -16,6 +16,8 @@ exports.handleDatabaseError = (err, req, res, next) => {
         if (err.code === '23503') {
             res.status(404).send({message: 'Request value does not exist at the moment in database.'});
         }
+
+        res.status(400).send({message: 'Bad request.'});
 
     } else {
         next(err);

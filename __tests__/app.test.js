@@ -295,7 +295,7 @@ describe('/api/articles/:article_id/comments', () => {
             .expect(400)
             .then(({body}) => {
                 const {message} = body;
-                expect(message).toBe('Bad request.')
+                expect(message).toBe('Invalid request input.')
         })
     })
 })
