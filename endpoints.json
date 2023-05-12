@@ -99,5 +99,10 @@
         "article_id": 1
       }
     }
+  },
+  "DELETE /api/comments/:comment_id": {
+    "description": "delete the comment of the given comment_id from the database.",
+    "queries": [],
+    "exampleResponse": {}
   }
 }
