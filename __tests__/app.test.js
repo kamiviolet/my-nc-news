@@ -202,6 +202,81 @@ describe('/api/articles', () => {
                     expect(message).toContain('Cannot order by ');
                 })
     })
+
+    it('POST - status 201 - responds with the newly added article, with all the above properties as well as certain properties.', () => {
+        const articleTemplate = {
+            author: 'icellusedkars',
+            title: 'Am I a cat? (Cont\')',
+            article_id: expect.any(Number),
+            votes: expect.any(Number),
+            topic: 'mitch',
+            body: 'I would like to be cat.. or not? Do i need to be one only because I like them so much?',
+            created_at: expect.any(String),
+            article_img_url: 'https://images.pexels.com/photos/158651/news-newsletter-newspaper-information-158651.jpeg?w=700&h=700',
+        }
+        const exampleInput =   {
+            author: 'icellusedkars',
+            title: 'Am I a cat? (Cont\')',
+            topic: 'mitch',
+            body: 'I would like to be cat.. or not? Do i need to be one only because I like them so much?',
+            article_img_url:
+              'https://images.pexels.com/photos/158651/news-newsletter-newspaper-information-158651.jpeg?w=700&h=700',
+          }
+
+        return request(app)
+            .post('/api/articles')
+            .send(exampleInput)
+            .expect(201)
+            .then(({body}) => {
+                const {article} = body;
+                expect(article).toMatchObject(articleTemplate);
+            })
+    })
+
+    it('POST - status 201 - avatar_url will have default value if not specified.', () => {
+        const articleTemplate = {
+            author: 'icellusedkars',
+            title: 'Am I a cat? (Cont\')',
+            article_id: expect.any(Number),
+            votes: expect.any(Number),
+            topic: 'mitch',
+            body: 'I would like to be cat.. or not? Do i need to be one only because I like them so much?',
+            created_at: expect.any(String),
+            article_img_url: 'https://images.pexels.com/photos/default-avatar.jpg',
+        }
+        const exampleInput =   {
+            author: 'icellusedkars',
+            title: 'Am I a cat? (Cont\')',
+            topic: 'mitch',
+            body: 'I would like to be cat.. or not? Do i need to be one only because I like them so much?',
+          }
+
+        return request(app)
+            .post('/api/articles')
+            .send(exampleInput)
+            .expect(201)
+            .then(({body}) => {
+                const {article} = body;
+                expect(article).toMatchObject(articleTemplate);
+            })
+    })
+
+    it('POST - status 400 - invalid format.', () => {
+        const exampleInput =   {
+            author: 'icellusedkars',
+            title: 'Am I a cat? (Cont\')',
+            body: 'I would like to be cat.. or not? Do i need to be one only because I like them so much?',
+          }
+
+        return request(app)
+            .post('/api/articles')
+            .send(exampleInput)
+            .expect(400)
+            .then(({body}) => {
+                const {message} = body;
+                expect(message).toBe('Invalid request format.');
+            })
+    })
 })
 
 describe('/api/articles/:article_id', () => {

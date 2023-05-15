@@ -1,5 +1,6 @@
-const db = require('../db/connection')
-const {validateExistingArticleId, validateExistingTopic} = require('../db/seeds/utils')
+const db = require('../db/connection');
+const format = require('pg-format');
+const {validateExistingArticleId, validateExistingTopic} = require('../db/seeds/utils');
 
 
 exports.fetchArticleById = (id) => {
@@ -61,7 +62,6 @@ exports.fetchAllArticles = (topic, sort='created_at', order='desc') => {
         })
 }
 
-
 exports.updateVotesByArticleId = (id, update) => {
     return validateExistingArticleId(id)
         .then(() => {
@@ -72,5 +72,26 @@ exports.updateVotesByArticleId = (id, update) => {
                 RETURNING *;
             `, [id, update.inc_votes])
         })
+        .then(({rows}) => rows[0])
+}
+
+exports.createNewArticle = (article) => {
+
+
+    const {
+        author,
+        title,
+        topic,
+        body,
+        article_img_url='https://images.pexels.com/photos/default-avatar.jpg'
+    } = article;
+
+    return db.query(`
+        INSERT INTO articles
+        (author, title, topic, body, article_img_url)
+        VALUES
+        ($1, $2, $3, $4, $5)
+        RETURNING *;
+    `, [author, title, topic, body, article_img_url])
         .then(({rows}) => rows[0])
 }
