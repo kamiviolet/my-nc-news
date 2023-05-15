@@ -275,26 +275,6 @@ describe('/api/articles/:article_id', () => {
             })
     })
 
-    it('PATCH - status 201 - the article in database is updated accordingly.', () => {
-        const example = { inc_votes : 1000 };
-        const article_id = 2;
-        return request(app)
-            .patch(`/api/articles/${article_id}`)
-            .send(example)
-            .expect(201)
-            .then(() => {
-                return connection
-                    .query(`
-                        SELECT * FROM articles
-                        WHERE article_id in ($1);
-                    `, [article_id])
-            })
-            .then(({rows}) => rows[0])
-            .then(article => {
-                expect(article.votes).toBe(example.inc_votes);
-            })
-    })
-
     it('PATCH - status 400 - invalid request format.', () => {
         return request(app)
             .patch('/api/articles/2')
@@ -509,6 +489,71 @@ describe('/api/comments/:comment_id', () => {
                 expect(message).toBe('Invalid request input.')
             })
     })
+    it('PATCH - status 201 - responds with the updated comment.', () => {
+        const example = { inc_votes : 10 };
+
+        return request(app)
+            .patch('/api/comments/2')
+            .send(example)
+            .expect(201)
+            .then(({body}) => {
+                const {comment} = body;
+                const commentTemplate = {
+                    comment_id: expect.any(Number),
+                    votes: expect.any(Number),
+                    created_at: expect.any(String),
+                    author: expect.any(String),
+                    body: expect.any(String),
+                    article_id: expect.any(Number),
+                }
+
+                expect(comment).toMatchObject(commentTemplate);
+                expect(comment.votes).toBe(24);
+            })
+    })
+    it('PATCH - status 400 - invalid request format.', () => {
+        return request(app)
+            .patch('/api/comments/2')
+            .send({ nonsense: 'Wahaha' })
+            .expect(400)
+            .then(({body}) => {
+                const {message} = body;
+                expect(message).toBe('Invalid request format.')
+            })
+    })
+
+    it('PATCH - status 400 - no request body.', () => {
+        return request(app)
+            .patch('/api/comments/2')
+            .send({})
+            .expect(400)
+            .then(({body}) => {
+                const {message} = body;
+                expect(message).toBe('Invalid request format.')
+            })
+    })
+
+    it('PATCH - status 400 - invalid numeric article_id.', () => {
+        return request(app)
+            .patch('/api/comments/99999')
+            .send({ inc_votes : 1 })
+            .expect(404)
+            .then(({body}) => {
+                const {message} = body;
+                expect(message).toBe('The comment_id does not exist (for now).')
+            })
+    })
+
+    it('PATCH - status 400 - invalid non-numeric article_id.', () => {
+        return request(app)
+            .patch('/api/comments/non-sense')
+            .send({ inc_votes : 1 })
+            .expect(400)
+            .then(({body}) => {
+                const {message} = body;
+                expect(message).toBe('Invalid request input.')
+            })
+    })
 })
 
 describe('/api/users', () => {    
@@ -541,7 +586,7 @@ describe('/api/users', () => {
 })
 
 describe('/api/users/:username', () => {
-    it('status 200 - responds with a user object which have the properties: username, name and avatar_url.', () => {
+    it('GET - status 200 - responds with a user object which have the properties: username, name and avatar_url.', () => {
         return request(app)
             .get('/api/users/rogersop')
             .expect(200)
@@ -558,7 +603,7 @@ describe('/api/users/:username', () => {
                 expect(user.avatar_url).toBe(expectedResult.avatar_url);
             })
     })
-    it('status 404 - nonexisting username.', () => {
+    it('GET - status 404 - nonexisting username.', () => {
         return request(app)
             .get('/api/users/XXXXX')
             .expect(404)
