@@ -37,3 +37,16 @@ exports.eraseCommentByCommentId = (id) => {
                 `, [id])
         })
 }
+
+exports.updateVotesByCommentId = (id, update) => {
+    return validateExistingCommentId(id)
+        .then(() => {
+            return db.query(`
+                UPDATE comments
+                SET votes = votes + $2
+                WHERE comment_id = $1
+                RETURNING *;
+            `, [id, update.inc_votes])
+        })
+        .then(({rows}) => rows[0])
+}
