@@ -190,7 +190,7 @@ describe('/api/articles', () => {
             .expect(400)
                 .then(({body}) => {
                     const {message} = body;
-                    expect(message).toBe('Bad request.');
+                    expect(message).toContain('Cannot sort by ');
                 })
     })
 
@@ -200,7 +200,7 @@ describe('/api/articles', () => {
             .expect(400)
                 .then(({body}) => {
                     const {message} = body;
-                    expect(message).toBe('Bad request.');
+                    expect(message).toContain('Cannot order by ');
                 })
     })
 })
@@ -236,7 +236,7 @@ describe('/api/articles/:article_id', () => {
             .expect(404)
             .then(({body}) => {
                 const {message} = body;
-                expect(message).toBe('No results.')
+                expect(message).toContain('No articles found for')
             })
     })
 
