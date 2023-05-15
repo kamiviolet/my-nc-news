@@ -61,7 +61,6 @@ describe('/api/topics', () => {
     })
 })
 
-
 describe('/api/articles', () => {
     it('GET - status 200 - responds with an array of articles from database.', () => {
         return request(app)
@@ -483,7 +482,6 @@ describe('/api/articles/:article_id/comments', () => {
     })
 })
 
-
 describe('/api/comments/:comment_id', () => {
     it('DELETE - status 204 - delete the given comment by comment_id from database', () => {
         return request(app)
@@ -513,7 +511,6 @@ describe('/api/comments/:comment_id', () => {
     })
 })
 
-
 describe('/api/users', () => {    
     it('GET - status 200 - responds with an array of objects.', () => {
         const {userData} = testData;
@@ -541,4 +538,34 @@ describe('/api/users', () => {
                 })
             })
     })
+})
+
+describe('/api/users/:username', () => {
+    it('status 200 - responds with a user object which have the properties: username, name and avatar_url.', () => {
+        return request(app)
+            .get('/api/users/rogersop')
+            .expect(200)
+            .then(({body}) => {
+                const {user} = body;
+                const expectedResult = {
+                    username: 'rogersop',
+                    name: 'paul',
+                    avatar_url: 'https://avatars2.githubusercontent.com/u/24394918?s=400&v=4'
+                  }
+                expect(user).toMatchObject(expectedResult);
+                expect(user.username).toBe(expectedResult.username);
+                expect(user.name).toBe(expectedResult.name);
+                expect(user.avatar_url).toBe(expectedResult.avatar_url);
+            })
+    })
+    it('status 404 - nonexisting username.', () => {
+        return request(app)
+            .get('/api/users/XXXXX')
+            .expect(404)
+            .then(({body}) => {
+                const {message} = body;
+                expect(message).toBe('The user XXXXX is not found currently.')
+            })
+    })
+
 })
