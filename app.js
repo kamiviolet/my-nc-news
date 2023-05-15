@@ -1,38 +1,24 @@
 const express = require('express');
-const { getTopics } = require('./controllers/topics.controller')
-const { getInstructions } = require('./controllers/main.controller')
-const { getArticleById, getAllArticles, patchVotesByArticleId } = require('./controllers/articles.controller')
-const { getCommentsByArticleId, postNewCommentByArticleId, deleteCommentByCommentId } = require('./controllers/comments.controller')
+const topicRouter = require('./routers/topics.router')
+const articleRouter = require('./routers/articles.router')
+const mainRouter = require('./routers/main.router')
+const commentRouter = require('./routers/comments.router')
+const userRouter = require('./routers/users.router')
 const { handleDatabaseError, handleCustomError, handleRestError, handleInvalidEndpoint } = require('./controllers/errors.handler')
-const { getAllUsers } = require('./controllers/users.controller')
 
 const app = express();
 
 app.use(express.json())
 
-app.route('/api')
-    .get(getInstructions)
+app.use('/api', mainRouter)
 
-app.route('/api/topics')
-    .get(getTopics)
+app.use('/api/topics', topicRouter)
 
-app.route('/api/articles')
-    .get(getAllArticles)
+app.use('/api/articles', articleRouter)
 
-app.route('/api/articles/:article_id')
-    .get(getArticleById)
-    .patch(patchVotesByArticleId)
+app.use('/api/users', userRouter)
 
-app.route('/api/articles/:article_id/comments')
-    .get(getCommentsByArticleId)
-    .post(postNewCommentByArticleId)
-
-app.route('/api/comments/:comment_id')
-    .delete(deleteCommentByCommentId)
-
-app.route('/api/users')
-    .get(getAllUsers)
-
+app.use('/api/comments', commentRouter)
 
 app.use(handleInvalidEndpoint)
     
