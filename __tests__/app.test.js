@@ -220,6 +220,26 @@ describe('/api/articles', () => {
                 })
     })
 
+    it('GET - status 400 - invalid value for limit query.', () => {
+        return request(app)
+            .get('/api/articles?limit=XXX')
+            .expect(400)
+                .then(({body}) => {
+                    const {message} = body;
+                    expect(message).toContain('is not a valid');
+                })
+    })
+
+    it('GET - status 400 - invalid value for p query.', () => {
+        return request(app)
+            .get('/api/articles?p=XXX')
+            .expect(400)
+                .then(({body}) => {
+                    const {message} = body;
+                    expect(message).toContain('is not a valid');
+                })
+    })
+
     it('POST - status 201 - responds with the newly added article, with all the above properties as well as certain properties.', () => {
         const articleTemplate = {
             author: 'icellusedkars',
@@ -413,13 +433,14 @@ describe('/api/articles/:article_id', () => {
 })
 
 describe('/api/articles/:article_id/comments', () => {
-    it('GET - status 200 - responds with an array of comments for the given article_id.', () => {
+    it('GET - status 200 - responds with an array of comments for the given article_id, by default first 10 comments of search will be shown.', () => {
         return request(app)
             .get('/api/articles/1/comments')
             .expect(200)
             .then(({body}) => {
                 const {comments} = body;
                 expect(comments).toBeArray();
+                expect(comments.length).toBe(10);
                 comments.forEach(comment => {
                     expect(comment.article_id).toBe(1);
                 })
@@ -464,6 +485,47 @@ describe('/api/articles/:article_id/comments', () => {
             const {comments} = body;
             expect(comments).toBeArrayOfSize(0); 
         })
+    })
+
+    it('GET - status 200 - accept query of limit', () => {
+        return request(app)
+            .get('/api/articles/1/comments?limit=20')
+            .expect(200)
+            .then(({body}) => {
+                const {comments} = body;
+                expect(comments).toBeArrayOfSize(11);
+            })
+    })
+
+    it('GET - status 200 - accept query of p', () => {
+        return request(app)
+            .get('/api/articles/1/comments?p=2')
+            .expect(200)
+            .then(({body}) => {
+                const {comments} = body;
+                expect(comments).toBeArrayOfSize(1);
+                expect(comments[0].comment_id).toBe(9);
+            })
+    })
+
+    it('GET - status 400 - invalid value for limit query.', () => {
+        return request(app)
+            .get('/api/articles/1/comments?limit=XXX')
+            .expect(400)
+                .then(({body}) => {
+                    const {message} = body;
+                    expect(message).toContain('is not a valid');
+                })
+    })
+
+    it('GET - status 400 - invalid value for p query.', () => {
+        return request(app)
+            .get('/api/articles/1/comments?p=XXX')
+            .expect(400)
+                .then(({body}) => {
+                    const {message} = body;
+                    expect(message).toContain('is not a valid');
+                })
     })
 
     it('GET - status 400 - invalid non-numeric article_id', () => {
