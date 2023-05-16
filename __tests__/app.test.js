@@ -461,6 +461,35 @@ describe('/api/articles/:article_id', () => {
                 expect(message).toBe('Invalid request input.')
             })
     })
+
+    it('DELETE - status 204 - responds with no content.', () => {
+        return request(app)
+            .delete('/api/articles/1')
+            .expect(204)
+            .then(({body}) => {
+                expect(body).toBeEmptyObject();
+            })
+    })
+
+    it('DELETE - status 404 - non exsiting numeric article_id.', () => {
+        return request(app)
+            .delete('/api/articles/99999')
+            .expect(404)
+            .then(({body}) => {
+                const {message} = body;
+                expect(message).toBe('The article_id does not exist (for now).')
+            })
+    })
+
+    it('DELETE - status 400 - invalid non-numeric article_id.', () => {
+        return request(app)
+            .delete('/api/articles/non-sense')
+            .expect(400)
+            .then(({body}) => {
+                const {message} = body;
+                expect(message).toBe('Invalid request input.')
+            })
+    })
 })
 
 describe('/api/articles/:article_id/comments', () => {
@@ -608,7 +637,7 @@ describe('/api/articles/:article_id/comments', () => {
             .expect(400)
             .then(({body}) => {
                 const {message} = body;
-                expect(message).toBe('Invalid request format.')
+                expect(message).toBe('Please provide username.')
         })
     })
 
