@@ -88,8 +88,6 @@ exports.updateVotesByArticleId = (id, update) => {
 }
 
 exports.createNewArticle = (article) => {
-
-
     const {
         author,
         title,
@@ -106,4 +104,14 @@ exports.createNewArticle = (article) => {
         RETURNING *;
     `, [author, title, topic, body, article_img_url])
         .then(({rows}) => rows[0])
+}
+
+exports.eraseArticleById = (id) => {
+    return validateExistingArticleId(id)
+        .then(() => {
+            db.query(`
+                DELETE FROM articles
+                WHERE article_id in ($1);
+            `, [id])
+        })
 }

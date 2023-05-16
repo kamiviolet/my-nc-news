@@ -25,6 +25,16 @@ exports.fetchCommentsByArticleId = (id, limit=10, p=1) => {
 }
 
 exports.createNewCommentByArticleId = (id, comment) => {
+    const {username, body} = comment;
+
+    if (username === undefined) {
+        return Promise.reject({status: 400, message: 'Please provide username.'})
+    }
+
+    if (body === undefined) {
+        return Promise.reject({status: 400, message: 'Please provide comment body.'})
+    }
+
     return db
         .query(`
                 INSERT INTO comments
@@ -32,7 +42,7 @@ exports.createNewCommentByArticleId = (id, comment) => {
                 VALUES
                 ($1, $3, $2)
                 RETURNING *;
-            `, [id, comment.username, comment.body])
+            `, [id, username, body])
         .then(({rows}) => rows[0])
 }
 
