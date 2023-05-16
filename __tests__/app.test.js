@@ -59,6 +59,37 @@ describe('/api/topics', () => {
                 })
             })
     })
+
+    it('POST - status 201 - responds with the newly added topic object.', () => {
+        const toBeAdded = {
+            "slug": "news",
+            "description": "any global or local news."
+        }
+
+        return request(app)
+            .post('/api/topics')
+            .send(toBeAdded)
+            .expect(201)
+            .then(({body}) => {
+                const {newTopic} = body;
+                expect(newTopic).toEqual(toBeAdded);
+            })
+    })
+
+    it('POST - status 400 - invalid format for creating new topic.', () => {
+        const toBeAdded = {
+            "slug": "news",
+        }
+
+        return request(app)
+            .post('/api/topics')
+            .send(toBeAdded)
+            .expect(400)
+            .then(({body}) => {
+                const {message} = body;
+                expect(message).toBe('Please provide description to create new topic.');
+            })
+    })
 })
 
 describe('/api/articles', () => {
