@@ -9,10 +9,10 @@ exports.getArticleById = (req, res, next) => {
 }
 
 exports.getAllArticles = (req, res, next) => {
-    const {topic, sort_by, order} = req.query;
+    const {topic, sort_by, order, limit, p} = req.query;
 
-    return fetchAllArticles(topic, sort_by, order)
-        .then(articles => res.status(200).send({articles}))
+    return fetchAllArticles(topic, sort_by, order, limit, p)
+        .then(({articles, total_count}) => res.status(200).send({articles, total_count}))
         .catch(err => next(err));
 }
 

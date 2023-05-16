@@ -68,24 +68,19 @@ describe('/api/articles', () => {
             .expect(200)
             .then(({body}) => {
                 const {articles} = body;
-                const {articleData} = testData;
-
+                
                 expect(articles).toBeArray();
-                expect(articles.length).toBe(articleData.length);
-
-                articles.forEach(article => {
-                    expect(article)
-                })
             })
     })
 
-    it('GET - status 200 - default sorted by date in descending order.', () => {
+    it('GET - status 200 - default sorted by date in descending order and limit within 10 results.', () => {
         return request(app)
             .get('/api/articles')
             .expect(200)
             .then(({body}) => {
                 const {articles} = body;
-                expect(articles).toBeSortedBy('created_at', {descending: true})
+                expect(articles).toBeSortedBy('created_at', {descending: true});
+                expect(articles).toBeArrayOfSize(10);
             })
     })
 
@@ -170,6 +165,28 @@ describe('/api/articles', () => {
                 articles.forEach(article => {
                     expect(article.topic).toBe('mitch');
                 })
+            })
+    })
+
+    it('GET - status 200 - accept queries: limit to limit how many entries are shown.', () => {
+        return request(app)
+            .get('/api/articles?limit=20')
+            .expect(200)
+            .then(({body}) => {
+                const {articles, total_count} = body;
+                expect(articles).toBeArrayOfSize(12);
+                expect(total_count).toBe(12);
+            })
+    })
+
+    it('GET - status 200 - accept queries: p to determine which range of entries to be shown.', () => {
+        return request(app)
+            .get('/api/articles?limit=10&p=2&sort_by=article_id&order=asc')
+            .expect(200)
+            .then(({body}) => {
+                const {articles} = body;
+                expect(articles.length).toBe(2);
+                expect(articles[0].article_id).toBe(11);
             })
     })
 

@@ -24,7 +24,7 @@ exports.fetchArticleById = (id) => {
         })
 }
 
-exports.fetchAllArticles = (topic, sort='created_at', order='desc') => {
+exports.fetchAllArticles = (topic, sort='created_at', order='desc', limit=10, p=1) => {
     const greenlist = ['author', 'title', 'article_id', 'topic', 'created_at', 'votes', 'comment_count'];
     const orderOption = ['desc', 'asc'];
     let formattedOrder = order.toUpperCase();
@@ -43,12 +43,24 @@ exports.fetchAllArticles = (topic, sort='created_at', order='desc') => {
         return Promise.reject({status: 400, message: `Cannot order by ${order}.`})
     }
 
+    if (typeof +limit !== 'number') {
+        return Promise.reject({status: 400, message: `${limit} is not a valid number.`})
+    }
+
+    if (typeof +p !== 'number') {
+        return Promise.reject({status: 400, message: `${p} is not a valid number.`})
+    }
+
     if (topic) {
         queryStr += "WHERE articles.topic = $1";
         queryVal.push(topic);
     }
 
-    queryStr += `\nGROUP BY articles.article_id, articles.topic ORDER BY ${sort} ${formattedOrder};`
+    queryStr += `
+        GROUP BY articles.article_id, articles.topic 
+        ORDER BY ${sort} ${formattedOrder}
+        LIMIT ${limit} OFFSET ${(p-1)*10};
+    `
 
     return validateExistingTopic(topic)
         .then(() => db.query(queryStr, queryVal))
@@ -58,7 +70,7 @@ exports.fetchAllArticles = (topic, sort='created_at', order='desc') => {
                 clone.comment_count = +d.comment_count
                 return clone;
             });
-            return copy;
+            return {articles: copy, total_count: copy.length};
         })
 }
 
