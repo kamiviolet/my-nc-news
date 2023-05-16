@@ -1,7 +1,15 @@
 const db = require('../db/connection')
 const {validateExistingArticleId, validateExistingCommentId} = require('../db/seeds/utils')
 
-exports.fetchCommentsByArticleId = (id) => {
+exports.fetchCommentsByArticleId = (id, limit=10, p=1) => {
+    if (isNaN(limit)) {
+        return Promise.reject({status: 400, message: `${limit} is not a valid limit value.`})
+    }
+
+    if (isNaN(p)) {
+        return Promise.reject({status: 400, message: `${p} is not a valid limit value.`})
+    }
+
     return validateExistingArticleId(id)
         .then(() => {
             return db.query(`
@@ -9,7 +17,8 @@ exports.fetchCommentsByArticleId = (id) => {
                 comment_id, votes, created_at, author, body, article_id
                 FROM comments
                 WHERE article_id in ($1)
-                ORDER BY created_at DESC;
+                ORDER BY created_at DESC
+                LIMIT ${limit} OFFSET ${limit * (p-1)};
             `, [id])
         }) 
         .then(({rows}) => rows)

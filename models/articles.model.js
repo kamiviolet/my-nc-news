@@ -43,12 +43,12 @@ exports.fetchAllArticles = (topic, sort='created_at', order='desc', limit=10, p=
         return Promise.reject({status: 400, message: `Cannot order by ${order}.`})
     }
 
-    if (typeof +limit !== 'number') {
-        return Promise.reject({status: 400, message: `${limit} is not a valid number.`})
+    if (isNaN(limit)) {
+        return Promise.reject({status: 400, message: `${limit} is not a valid limit value.`})
     }
 
-    if (typeof +p !== 'number') {
-        return Promise.reject({status: 400, message: `${p} is not a valid number.`})
+    if (isNaN(p)) {
+        return Promise.reject({status: 400, message: `${p} is not a valid page value.`})
     }
 
     if (topic) {
