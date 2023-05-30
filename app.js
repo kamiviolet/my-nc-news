@@ -5,8 +5,11 @@ const mainRouter = require('./routers/main.router')
 const commentRouter = require('./routers/comments.router')
 const userRouter = require('./routers/users.router')
 const { handleDatabaseError, handleCustomError, handleRestError, handleInvalidEndpoint } = require('./controllers/errors.handler')
+const cors = require('cors');
 
 const app = express();
+
+app.use(cors());
 
 app.use(express.json())
 
