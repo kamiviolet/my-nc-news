@@ -797,6 +797,23 @@ describe('/api/users', () => {
                 })
             })
     })
+
+    it('POST - status 201 - post a new user', () => {
+        return request(app)
+            .post('/api/users')
+            .send({
+                username: "kami",
+                name: "kami",
+                avatar_url: ""
+            })
+            .expect(201)
+            .then(({body}) => {
+                const {user} = body;
+                expect(user).toHaveProperty('username');
+                expect(user).toHaveProperty('name');
+                expect(user).toHaveProperty('avatar_url');
+            })
+    })
 })
 
 describe('/api/users/:username', () => {
