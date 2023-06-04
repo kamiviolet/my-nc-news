@@ -63,7 +63,6 @@ exports.fetchAllArticles = (topic, sort='created_at', order='desc', limit=10, p=
         ORDER BY ${sort} ${formattedOrder}
         LIMIT ${limit} OFFSET ${(p-1)*limit};
     `
-    console.log(queryStr)
     return validateExistingTopic(topic)
         .then(() => db.query(queryStr, queryVal))
         .then(({rows}) => {
