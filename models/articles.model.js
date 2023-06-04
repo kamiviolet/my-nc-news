@@ -30,10 +30,11 @@ exports.fetchAllArticles = (topic, sort='created_at', order='desc', limit=10, p=
     let formattedOrder = order.toUpperCase();
     let queryStr = `
         SELECT
-        articles.author, articles.title, articles.article_id, articles.topic, articles.created_at, articles.votes, articles.article_img_url, COUNT(comments.*) AS comment_count
+        articles.author, articles.title, articles.article_id, articles.topic, articles.created_at, articles.votes, articles.article_img_url, COUNT(*)::INT AS comment_count
         FROM articles
         LEFT JOIN comments USING (article_id)`;
     const queryVal = [];
+    let countQuery = 'SELECT COUNT(*)::INT FROM articles'
 
     if (!greenlist.includes(sort)) {
         return Promise.reject({status: 400, message: `Cannot sort by ${sort}.`})
@@ -52,25 +53,25 @@ exports.fetchAllArticles = (topic, sort='created_at', order='desc', limit=10, p=
     }
 
     if (topic) {
-        queryStr += "WHERE articles.topic = $1";
+        countQuery += " WHERE articles.topic = $1";
+        queryStr += " WHERE articles.topic = $1";
         queryVal.push(topic);
     }
 
     queryStr += `
-        GROUP BY articles.article_id, articles.topic 
+        GROUP BY articles.article_id
         ORDER BY ${sort} ${formattedOrder}
-        LIMIT ${limit} OFFSET ${(p-1)*10};
+        LIMIT ${limit} OFFSET ${(p-1)*limit};
     `
-
+    console.log(queryStr)
     return validateExistingTopic(topic)
         .then(() => db.query(queryStr, queryVal))
-        .then(({rows}) => {        
-            const copy = rows.map(d => {
-                const clone = JSON.parse(JSON.stringify(d))
-                clone.comment_count = +d.comment_count
-                return clone;
-            });
-            return {articles: copy, total_count: copy.length};
+        .then(({rows}) => {
+            return Promise.all([rows, db.query(countQuery, queryVal)])
+        })
+        .then(([articles, {rows}]) => {
+            const total_count = +rows[0].count;
+            return {articles, total_count};
         })
 }
 

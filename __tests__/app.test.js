@@ -152,11 +152,11 @@ describe('/api/articles', () => {
 
     it('GET - status 200 - accept queries: sort_by to sort the entries by any specific column.', () => {
         return request(app)
-            .get('/api/articles?sort_by=author')
+            .get('/api/articles?sort_by=created_at&order=desc')
             .expect(200)
             .then(({body}) => {
                 const {articles} = body;
-                expect(articles).toBeSortedBy('author', {descending: true});
+                expect(articles).toBeSortedBy('created_at', {descending: true});
             })
     })
 
