@@ -834,6 +834,27 @@ describe('/api/users/:username', () => {
                 expect(user.avatar_url).toBe(expectedResult.avatar_url);
             })
     })
+    
+    it('PUT - status 201 - responds with a user object with updated information.', () => {
+        return request(app)
+            .put('/api/users/rogersop')
+            .send({
+                username: "rogersop",
+                avatar_url: "https://vignette.wikia.nocookie.net/mrmen/images/4/4f/MR_JELLY_4A.jpg/revision/latest?cb=20180104121141",
+                name: "haha"
+            })
+            .expect(201)
+            .then(({body}) => {
+                const {user} = body;
+
+                expect(user).toEqual({
+                    username: "rogersop",
+                    avatar_url: "https://vignette.wikia.nocookie.net/mrmen/images/4/4f/MR_JELLY_4A.jpg/revision/latest?cb=20180104121141",
+                    name: "haha"
+                })
+            })
+    })
+
     it('GET - status 404 - nonexisting username.', () => {
         return request(app)
             .get('/api/users/XXXXX')

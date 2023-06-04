@@ -24,3 +24,13 @@ exports.createNewUser = ({username, name, avatar_url}) => {
     `, [username, name, avatar_url])
         .then(({rows}) => rows[0])
 }
+
+exports.putNewUserInfoByUsername = ({username, name, avatar_url}) => {
+    return db.query(`
+                UPDATE users
+                SET name = $2, avatar_url = $3
+                WHERE username = $1
+                RETURNING *;
+            `, [username, name, avatar_url])
+            .then(({rows}) => rows[0])
+}
