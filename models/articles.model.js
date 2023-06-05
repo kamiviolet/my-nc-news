@@ -104,6 +104,20 @@ exports.createNewArticle = (article) => {
         RETURNING *;
     `, [author, title, topic, body, article_img_url])
         .then(({rows}) => rows[0])
+        .then((data) => {
+            return db
+            .query(`
+                SELECT
+                articles.*, COUNT(comments.article_id)::INT AS comment_count
+                FROM articles
+                LEFT JOIN comments USING (article_id)
+                WHERE article_id in ($1)
+                GROUP BY articles.article_id;
+            `, [data.article_id])
+        })
+        .then(({rows}) => {
+            return rows[0]
+        })
 }
 
 exports.eraseArticleById = (id) => {
